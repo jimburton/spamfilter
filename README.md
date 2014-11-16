@@ -32,6 +32,6 @@ Ways to improve the program
 * Make it more robust by adding error checking around the CLI, reading files etc.,
 * An application really shouldn't write data into the place it was installed, so move the database to within a folder called `.spamfilter` in the user's home folder, 
 * Write the score assigned to each email into the `X-Spam-Status` header of the file and save the modified file,
-* Make the program capable of working as a real filter, by enabling it to read the contents of messages from stdin,
+* Make the program capable of working as a real filter, by enabling it to read the contents of messages from `stdin`,
 * Make the program self-training, so that every time it classifies an email, update the word counts in the database accordingly... 
-* Add some documentation and improve on Cabal metadata
+* Add some documentation and improve on the Cabal metadata.
