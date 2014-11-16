@@ -1,3 +1,16 @@
+{- |
+Module      :  Train.hs
+Description :  Functions for training the spam program
+Copyright   :  (c) Jim Burton
+License     :  MIT
+
+Maintainer  :  j.burton@brighton.ac.uk
+Stability   :  provisional 
+Portability :  portable 
+
+Contains functions devoted to reading in mail messages and passing their contents 
+to functions in the classify module. 
+-}
 module Train (train, getWords) where
 
 import Prelude hiding (readFile)

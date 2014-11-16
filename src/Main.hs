@@ -1,4 +1,17 @@
-{-# LANGUAGE OverloadedStrings #-}
+{- |
+Module      :  Main.hs
+Description :  The entry point for the spam program
+Copyright   :  (c) Jim Burton
+License     :  MIT
+
+Maintainer  :  j.burton@brighton.ac.uk
+Stability   :  provisional 
+Portability :  portable 
+
+This is the entry point for the spamfilter program. Its main responsibiilty is to
+read the command-line arguments and call the appropriate functions in other 
+modules.
+-}
 module Main where
 
 import System.Environment (getArgs)

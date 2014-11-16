@@ -1,13 +1,13 @@
-spam
-====
+spamfilter
+=========
 
-A Haskell port of Peter Seibel's [Bayesian spam filter](http://www.gigamonkeys.com/book/practical-a-spam-filter.html), for teaching purposes in the Haskell course at the University of Brighton. 
+A Haskell port of Peter Seibel's [Bayesian spam filter](http://www.gigamonkeys.com/book/practical-a-spam-filter.html), for teaching purposes in the Haskell course at the University of Brighton. It is used to demonstrate functional problem-solving, writing a program with several modules, basic IO techniques and interacting with a relational database. 
 
 Setting up the project
 ----------------------
 
 * Clone the project:
-    $ git clone git@github.com:jimburton/spam.git
+    $ git clone git@github.com:jimburton/spamfilter.git
 * Build it:
 ```
     $ cd spam
@@ -15,12 +15,12 @@ Setting up the project
 ```
 * Train the filter by downloading some collections of spam/ham and running the program over them. For example, download the tarballs from https://spamassassin.apache.org/publiccorpus/, and extract them in a convenient place. Then, if you have extracted a tarball of ham messages into a folder called HAM_FOLDER,:
 ```    
-    $ spam train Ham HAM_FOLDER/
+    $ spamfilter train Ham HAM_FOLDER/
 ```  
   The more you train it, the more reliable it will become.
 * Once you have trained the program on several collections of good and bad emails, test its ability to classify messages correctly. There are several messages you can experiment with in etc/mail:
 ```   
-    $ spam classify etc/mail/ham1.email
+    $ spamfilter classify etc/mail/ham1.email
 ```
 Ways to improve the program
 ---------------------------
