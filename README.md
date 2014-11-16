@@ -1,7 +1,7 @@
 spam
 ====
 
-A Haskell port of Peter Seibel's (http://www.gigamonkeys.com/book/practical-a-spam-filter.html)[Bayesian spam filter], for pedagogic purposes. 
+A Haskell port of Peter Seibel's [Bayesian spam filter](http://www.gigamonkeys.com/book/practical-a-spam-filter.html), for pedagogic purposes. 
 
 Setting up the project
 ----------------------
