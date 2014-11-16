@@ -27,7 +27,7 @@ classifyAct (msgPath:args) = do
   wm <- getWMap
   ws <- getWords msgPath
   let (typ, score) = classify wm ws
-  putStrLn $ (show typ) ++ ": " ++ (show score)
+  putStrLn $ show typ ++ ": " ++ show score
 
 main = do  
   args <- getArgs

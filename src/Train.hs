@@ -22,7 +22,7 @@ train wm path t = do
   isDirectory <- doesDirectoryExist path
   if isDirectory then do fs <- getRecursiveContents path
                          foldM (\acc f -> trainFile (fromJust acc) f t) (Just wm) fs
-  else (trainFile wm path t) `catch` handler
+  else trainFile wm path t `catch` handler
 
 trainFile :: WMap -> FilePath -> MsgType -> IO (Maybe WMap)
 trainFile wm path t = do
@@ -33,7 +33,7 @@ getWords :: FilePath -> IO [String]
 getWords p = do
   str <- readFile p
   let lineBreakPat = "^\\s*$"
-      (before, _, after) = (unpack str) =~ lineBreakPat :: (String,String,String)
+      (before, _, after) = unpack str =~ lineBreakPat :: (String,String,String)
       str' = if null after then before else after
       --just the actual words
       wordPat = "([a-zA-Z]\\w*)"

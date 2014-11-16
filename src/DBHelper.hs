@@ -41,10 +41,10 @@ getWMap = do
   conn <- open "../spam.db"
   r <- query_ conn "SELECT * from words" :: IO [WordRow]
   let wMap = foldl (\ht (WordRow i w hs ss) -> M.insert w 
-                    (WordFeature {word = w,
-                                  hamCount = hs,
-                                  spamCount = ss,
-                                  pk = Just i}) ht) 
+                    WordFeature {word = w,
+                                 hamCount = hs,
+                                 spamCount = ss,
+                                 pk = Just i} ht) 
              M.empty r
   [hc] <- query_ conn "SELECT count from counts where type = 'H'" :: IO [Only Int]
   [sc] <- query_ conn "SELECT count from counts where type = 'S'" :: IO [Only Int]

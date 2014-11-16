@@ -19,11 +19,11 @@ classification s | s <= maxHamScore  = Ham
                  | otherwise         = Unclear
 
 getWordFeature :: WMap -> String -> WordFeature 
-getWordFeature (_, _, m) str = maybe (WordFeature 
+getWordFeature (_, _, m) str = maybe WordFeature 
                                       {word = str, 
                                        hamCount = 0, 
                                        spamCount = 0,
-                                       pk = Nothing}) id (M.lookup str m)
+                                       pk = Nothing} id (M.lookup str m)
 
 extractFeatures :: WMap -> [String] -> [WordFeature]
 extractFeatures m = map (getWordFeature m) 
@@ -55,8 +55,8 @@ getWordFeat w ham spam thePK = WordFeature {word = w,
 
 spamProb :: WMap -> WordFeature -> Float
 spamProb (sc, hc, m) feat = 
-    let spamFreq = (fromIntegral $ spamCount feat) / (fromIntegral $ max 1 sc)
-        hamFreq = (fromIntegral $ hamCount feat) / (fromIntegral $ max 1 hc)
+    let spamFreq = fromIntegral (spamCount feat) / fromIntegral (max 1 sc)
+        hamFreq = fromIntegral (hamCount feat) / fromIntegral (max 1 hc)
     in
       spamFreq / (spamFreq + hamFreq) 
 
@@ -64,7 +64,7 @@ bayesSpamProb (sc, hc, m) feat =
     let assumedProb =  0.5
         weight = 1
         basicProb = spamProb (sc, hc, m) feat
-        dataPoints = (fromIntegral $ spamCount feat) + (fromIntegral $ hamCount feat)
+        dataPoints = fromIntegral (spamCount feat) + fromIntegral (hamCount feat)
     in
       ((weight * assumedProb) + (dataPoints * basicProb)) / (weight + dataPoints)
 
@@ -79,14 +79,14 @@ score (sc, hc, m) feats =
 
 fisher :: [Float] -> Int -> Float
 fisher probs numProbs = inverseChiSquare 
-                        (foldl (+) 0 (map log probs) * (negate 2.0)) (2*numProbs)
+                        (sum (map log probs) * negate 2.0) (2*numProbs)
 
 inverseChiSquare :: Float -> Int -> Float
 inverseChiSquare value df = 
     if odd df then error "Degree must be even"
     else let m = value / 2.0
-             e = exp (fromIntegral 1)
-             sum = e ** (negate m)
+             e = exp 1
+             sum = e ** negate m
              term = sum
              dfRange = take (df `div` 2) $ iterate (+1) 1
              (sum', term') = foldl (\(s,t) i -> let t' = t * (m/i) in
