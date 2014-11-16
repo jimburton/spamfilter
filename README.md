@@ -10,9 +10,11 @@ Setting up the project
     $ git clone git@github.com:jimburton/spamfilter.git
 * Build it:
 ```
-    $ cd spam
+    $ cd spamfilter
     $ cabal install
 ```
+* Run the script `setupdb.sh`
+
 * Train the filter by downloading some collections of spam/ham and running the program over them. For example, download the tarballs from https://spamassassin.apache.org/publiccorpus/, and extract them in a convenient place. Then, if you have extracted a tarball of ham messages into a folder called HAM_FOLDER,:
 ```    
     $ spamfilter train Ham HAM_FOLDER/
