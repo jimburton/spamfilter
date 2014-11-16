@@ -1,0 +1,77 @@
+
+./DBHelper.hs,242
+module DBHelper DBHelper1,2
+putWMap putWMap10,11
+putWMap putWMap11,12
+updateCount updateCount22,23
+updateCount updateCount23,24
+updateWord updateWord30,31
+insertWord insertWord34,35
+getWMap getWMap38,39
+getWMap getWMap39,40
+
+./Train.hs,214
+module Train Train0,1
+train train11,12
+train train12,13
+trainFile trainFile18,19
+trainFile trainFile19,20
+getRecursiveContents getRecursiveContents23,24
+getRecursiveContents getRecursiveContents24,25
+
+./Main.hs,201
+module Main Main1,2
+dispatch dispatch10,11
+dispatch dispatch11,12
+trainAct trainAct15,16
+trainAct trainAct16,17
+classifyAct classifyAct23,24
+classifyAct classifyAct24,25
+main main31,32
+
+./Types.hs,568
+module Types Types0,1
+data MsgType MsgType6,7
+data MsgType = Ham Ham6,7
+data MsgType = Ham | Unclear Unclear6,7
+data MsgType = Ham | Unclear | Spam Spam6,7
+data WordFeature WordFeature8,9
+data WordFeature = WordFeature WordFeature8,9
+data WordFeature = WordFeature {word word8,9
+                                hamCount hamCount9,10
+                                spamCount spamCount10,11
+                                pk pk11,12
+type WMap WMap14,15
+data WordRow WordRow16,17
+data WordRow = WordRow WordRow16,17
+instance instance18,19
+
+./Classify.hs,877
+module Classify Classify0,1
+maxHamScore, minSpamScore minSpamScore7,8
+maxHamScore,maxHamScore7,8
+maxHamScore maxHamScore8,9
+minSpamScore minSpamScore9,10
+classify classify11,12
+classify classify12,13
+classification classification16,17
+classification classification17,18
+getWordFeature getWordFeature21,22
+getWordFeature getWordFeature22,23
+extractFeatures extractFeatures28,29
+extractFeatures extractFeatures29,30
+trainWMap trainWMap31,32
+trainWMap trainWMap32,33
+incrementCount incrementCount35,36
+incrementCount incrementCount36,37
+getWordFeat getWordFeat51,52
+getWordFeat getWordFeat52,53
+spamProb spamProb57,58
+spamProb spamProb58,59
+bayesSpamProb bayesSpamProb64,65
+score score72,73
+score score73,74
+fisher fisher81,82
+fisher fisher82,83
+inverseChiSquare inverseChiSquare85,86
+inverseChiSquare inverseChiSquare86,87
