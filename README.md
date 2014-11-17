@@ -24,6 +24,8 @@ Setting up the project
 ```   
     $ spamfilter classify etc/mail/ham1.email
 ```
+Note that you can modify the `testAndTrain` function in the `Main` module to make initial training easier to do -- supply the paths to your own collections of spam/ham and your test messages.
+
 Ways to improve the program
 ---------------------------
 
@@ -34,3 +36,5 @@ Ways to improve the program
 * Make the program capable of working as a real filter, by enabling it to read the contents of messages from `stdin`,
 * Make the program self-training, so that every time it classifies an email, update the word counts in the database accordingly... 
 * Add some documentation and improve on the Cabal metadata.
+
+

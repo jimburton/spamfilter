@@ -1,4 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
+{- |
+Module      :  DBHelper.hs
+Description :  Database helper for the spamfilter program
+Copyright   :  (c) Jim Burton
+License     :  MIT
+
+Maintainer  :  j.burton@brighton.ac.uk
+Stability   :  provisional 
+Portability :  portable 
+
+Module which supports interaction with the sqlite database which stores the 
+results of training the filter. Uses the library sqlite-simple to access an
+SQLite database.
+-}
 module DBHelper (putWMap, getWMap) where
 
 import Control.Applicative
@@ -14,6 +28,7 @@ import Types (WordFeature(..), WordRow(..), WMap(..), MsgType(..))
 dbDir :: IO String
 dbDir = getUserDataDir ("spamfilter" </> "spam.db")
 
+{-| Store the contents of a WMap in the database. -}
 putWMap :: WMap -> IO ()
 putWMap (hc, sc, m) = do
   userdir <- dbDir
@@ -27,6 +42,7 @@ putWMap (hc, sc, m) = do
     updateCount conn hc Ham
     updateCount conn sc Spam
 
+{-| Update a row in the counts table. -}
 updateCount :: Connection -> Int -> MsgType -> IO ()
 updateCount conn count t = do
   let c = case t of 
@@ -35,14 +51,17 @@ updateCount conn count t = do
   execute conn "UPDATE counts SET count=? WHERE type = ?" 
               (count :: Int, c :: String)
 
+{-| Update a row in the words table. -}
 updateWord conn WordFeature {hamCount = hs, spamCount = ss, pk = Just i} = 
     execute conn "UPDATE words SET hamcount=?, spamcount=? WHERE id = ?" 
                 (hs :: Int, ss :: Int, i :: Int) 
 
+{-| Insert a word that we haven't seen before -}
 insertWord conn WordFeature {word = w, hamCount = hs, spamCount = ss} = 
     execute conn "INSERT INTO words (word, hamcount, spamcount) VALUES (?,?,?)" 
                 (w :: String, hs :: Int, ss :: Int) 
    
+{-| Pull the contents of the database into a WMap. -}
 getWMap :: IO WMap
 getWMap = do
   userdir <- dbDir
