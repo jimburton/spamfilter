@@ -1,23 +1,50 @@
-module Classify (classify, trainWMap) where
+{- |
+Module      :  Classify.hs
+Description :  Classifying new messages as ham or spam
+Copyright   :  (c) Jim Burton
+License     :  MIT
+
+Maintainer  :  j.burton@brighton.ac.uk
+Stability   :  provisional 
+Portability :  portable 
+
+Module which provides functions to classify an individual message as 
+Ham|Spam|Unclear. (All of the functions in this module are pure and may be 
+a good target for parallelisation...) 
+-}
+module Classify (classify, getWordFeature, getWordFeat) where
 
 import qualified Data.Map as M
 
 import Types
 
-maxHamScore, minSpamScore :: Float
+{-| A message with a higher rating than maxHamScore is not ham. -}
+maxHamScore :: Float
 maxHamScore = 0.4
+
+{-| A message with a lower rating than minSpamScore is not spam. -}
+minSpamScore :: Float
 minSpamScore = 0.6
 
+{-| Classify the contents of a message as Ham|Spam|Unclear, based on
+the contents of the WMap. -}
 classify :: WMap -> [String] -> (MsgType, Float)
 classify wm str = let feats = extractFeatures wm str
                       s = score wm feats in
                   (classification s, s)
 
+{-| Returns the type associated with a given score. -}
 classification :: Float -> MsgType
 classification s | s <= maxHamScore  = Ham
                  | s >= minSpamScore = Spam
                  | otherwise         = Unclear
 
+{-| Turn a list of strings into a list of WordFeatures. -}
+extractFeatures :: WMap -> [String] -> [WordFeature]
+extractFeatures m = map (getWordFeature m) 
+
+{-| Look up a word in the WMap, retrieving the WordFeature associated
+with this word. If it isn't in the WMap yet, create a new WordFeature. -}
 getWordFeature :: WMap -> String -> WordFeature 
 getWordFeature (_, _, m) str = maybe WordFeature 
                                       {word = str, 
@@ -25,34 +52,14 @@ getWordFeature (_, _, m) str = maybe WordFeature
                                        spamCount = 0,
                                        pk = Nothing} id (M.lookup str m)
 
-extractFeatures :: WMap -> [String] -> [WordFeature]
-extractFeatures m = map (getWordFeature m) 
-
-trainWMap :: WMap -> [String] -> MsgType -> WMap
-trainWMap m s t = foldl (incrementCount t) m s
-
-incrementCount :: MsgType -> WMap -> String -> WMap
-incrementCount Ham (hc, sc, m) s = 
-    let mfeat = M.lookup s m 
-        feat = maybe (getWordFeat s 1 0 Nothing) 
-               (\wf -> getWordFeat s (hamCount wf+1) 
-                       (spamCount wf) (pk wf)) mfeat 
-    in 
-      (hc+1, sc, M.insert s feat m)
-incrementCount Spam (hc, sc, m) s = 
-    let mfeat = M.lookup s m 
-        feat = maybe (getWordFeat s 0 1 Nothing) 
-               (\wf -> getWordFeat s (hamCount wf) 
-                       (spamCount wf + 1) (pk wf)) mfeat 
-    in 
-      (hc, sc+1, M.insert s feat m)
-
+{-| Wrapper for the WordFeature type constructor. -}
 getWordFeat :: String -> Int -> Int -> Maybe Int -> WordFeature
 getWordFeat w ham spam thePK = WordFeature {word = w, 
                                             hamCount = ham, 
                                             spamCount = spam,
                                             pk = thePK} 
 
+{-| The basic probability that a WordFeature contains a spam word. -}
 spamProb :: WMap -> WordFeature -> Float
 spamProb (sc, hc, m) feat = 
     let spamFreq = fromIntegral (spamCount feat) / fromIntegral (max 1 sc)
@@ -60,6 +67,9 @@ spamProb (sc, hc, m) feat =
     in
       spamFreq / (spamFreq + hamFreq) 
 
+{-| The Bayesean probability that a WordFeature contains a spam word --
+i.e., the probability based on the probilities of the other words in the message
+being spam. -}
 bayesSpamProb (sc, hc, m) feat = 
     let assumedProb =  0.5
         weight = 1
@@ -68,6 +78,7 @@ bayesSpamProb (sc, hc, m) feat =
     in
       ((weight * assumedProb) + (dataPoints * basicProb)) / (weight + dataPoints)
 
+{-| Produce a score for a list of WordFeatures representing an individual message. -}
 score :: WMap -> [WordFeature] -> Float
 score (sc, hc, m) feats = 
     let spamProbs = map (bayesSpamProb (sc, hc, m)) feats
@@ -77,10 +88,12 @@ score (sc, hc, m) feats =
         s = 1.0 - fisher hamProbs numProbs in
     ((1-h) + s) / 2.0
 
+{-| Fisher's combined probability test. -}
 fisher :: [Float] -> Int -> Float
 fisher probs numProbs = inverseChiSquare 
                         (sum (map log probs) * negate 2.0) (2*numProbs)
 
+{-| The inverse chi-squared function. -}
 inverseChiSquare :: Float -> Int -> Float
 inverseChiSquare value df = 
     if odd df then error "Degree must be even"
