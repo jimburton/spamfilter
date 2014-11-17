@@ -34,7 +34,8 @@ train :: WMap -> FilePath -> MsgType -> IO (Maybe WMap)
 train wm path t = do
   isDirectory <- doesDirectoryExist path
   if isDirectory then do fs <- getRecursiveContents path
-                         foldM (\acc f -> trainFile (fromJust acc) f t) (Just wm) fs
+                         foldM (\acc f -> trainFile (fromJust acc) f t 
+                                          `catch` handler) (Just wm) fs
   else trainFile wm path t `catch` handler
 
 trainFile :: WMap -> FilePath -> MsgType -> IO (Maybe WMap)
