@@ -3,7 +3,7 @@
 SPAMFILTER_DATA_DIR=${HOME}/.local/share/spamfilter
 
 if [ ! -d ${SPAMFILTER_DATA_DIR} ]; then
-    mkdir ${SPAMFILTER_DATA_DIR};
+    mkdir -p ${SPAMFILTER_DATA_DIR};
 fi
 
 sqlite3 ${SPAMFILTER_DATA_DIR}/spam.db "DROP TABLE IF EXISTS words;\
