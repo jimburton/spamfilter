@@ -6,11 +6,18 @@ import Database.SQLite.Simple
 import Database.SQLite.Simple.FromRow
 import qualified Data.Map as M
 
+import System.Environment.XDG.BaseDir (getUserDataDir)
+import System.FilePath    ((</>))
+
 import Types (WordFeature(..), WordRow(..), WMap(..), MsgType(..))
+
+dbDir :: IO String
+dbDir = getUserDataDir ("spamfilter" </> "spam.db")
 
 putWMap :: WMap -> IO ()
 putWMap (hc, sc, m) = do
-  conn <- open "../spam.db"
+  userdir <- dbDir
+  conn <- open userdir
   withTransaction conn $ do
     let (is, us) = foldl (\(is,us) (_, feat@WordFeature{pk=mi})
                           -> maybe (feat:is,us) (const (is,feat:us)) mi) 
@@ -37,8 +44,9 @@ insertWord conn WordFeature {word = w, hamCount = hs, spamCount = ss} =
                 (w :: String, hs :: Int, ss :: Int) 
    
 getWMap :: IO WMap
-getWMap = do 
-  conn <- open "../spam.db"
+getWMap = do
+  userdir <- dbDir
+  conn <- open userdir
   r <- query_ conn "SELECT * from words" :: IO [WordRow]
   let wMap = foldl (\ht (WordRow i w hs ss) -> M.insert w 
                     WordFeature {word = w,

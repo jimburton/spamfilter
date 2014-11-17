@@ -30,7 +30,6 @@ Ways to improve the program
 * Write some tests using Quickcheck or HUnit,
 * Refactor to use applicative and monadic styles where it makes the code easier to read,
 * Make it more robust by adding error checking around the CLI, reading files etc.,
-* An application really shouldn't write data into the place it was installed, so move the database to within a folder called `.spamfilter` in the user's home folder, 
 * Write the score assigned to each email into the `X-Spam-Status` header of the file and save the modified file,
 * Make the program capable of working as a real filter, by enabling it to read the contents of messages from `stdin`,
 * Make the program self-training, so that every time it classifies an email, update the word counts in the database accordingly... 
