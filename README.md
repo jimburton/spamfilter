@@ -9,7 +9,10 @@ Setting up the project
 ----------------------
 
 * Clone the project:
+    
+```
     $ git clone git@github.com:jimburton/spamfilter.git
+```
 * Build the program:
 ```
     $ cd spamfilter
