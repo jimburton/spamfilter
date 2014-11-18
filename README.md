@@ -22,7 +22,7 @@ Setting up the project
     $ spamfilter train Ham HAM_FOLDER/
     $ spamfilter train Spam SPAM_FOLDER
 ```  
-  The more you train it, the more reliable it will become. Don't expect perfect results by the way! More reliable spam filters like SpamAssasin have been in development since the late 1990s and use a variety of techniques. In particular, using a naive Bayesian approach such as this program does is known to generate quite a large number of false positives (spam mistakenly identified as ham).
+  The more you train it, the more reliable it will become. Don't expect perfect results by the way! Reliable, modern spam filters like [SpamAssassin](http://spamassassin.apache.org/) have been in development since the late 1990s and use a variety of techniques. In particular, using a naive Bayesian approach such as this program does is known to generate quite a large number of false positives (spam mistakenly identified as ham).
 * Once you have trained the program on several collections of good and bad emails, test its ability to classify messages correctly. There are several messages you can experiment with in etc/mail:
 ```   
     $ spamfilter classify etc/mail/ham1.email
