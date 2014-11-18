@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-sqlite3 spam.db "DROP TABLE IF EXISTS words;\
+SPAMFILTER_DATA_DIR=${HOME}/.local/share/spamfilter
+
+if [ ! -d ${SPAMFILTER_DATA_DIR} ]; then
+    mkdir -p ${SPAMFILTER_DATA_DIR};
+fi
+
+sqlite3 ${SPAMFILTER_DATA_DIR}/spam.db "DROP TABLE IF EXISTS words;\
   CREATE TABLE words (id INTEGER PRIMARY KEY, word text NOT NULL UNIQUE,\
   hamcount INTEGER NOT NULL, spamcount INTEGER NOT NULL);\
   DROP TABLE IF EXISTS counts;\
