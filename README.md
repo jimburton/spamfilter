@@ -1,7 +1,9 @@
 spamfilter
 =========
 
-A Haskell port of Peter Seibel's [Naive Bayesian spam filter](http://www.gigamonkeys.com/book/practical-a-spam-filter.html), for teaching purposes in the Haskell course at the University of Brighton. It is used to demonstrate functional problem-solving, writing a program with several modules, basic IO techniques and interacting with a relational database. 
+A Haskell port of Peter Seibel's [Naive Bayesian spam filter](http://www.gigamonkeys.com/book/practical-a-spam-filter.html), for teaching purposes in the Haskell course at the University of Brighton. It is used to demonstrate functional problem-solving, writing a program with several modules, basic IO techniques and interacting with a relational database.
+
+Details on the techniques used (and their limitations) can be found here: (http://en.wikipedia.org/wiki/Naive_Bayes_spam_filtering)
 
 Setting up the project
 ----------------------
