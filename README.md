@@ -11,8 +11,9 @@ Setting up the project
 * Clone the project:
     
 ```
-    $ git clone git@github.com:jimburton/spamfilter.git
+$ git clone git@github.com:jimburton/spamfilter.git
 ```
+
 * Build the program:
 ```
     $ cd spamfilter
@@ -37,6 +38,7 @@ Ways to improve the program
 
 * Write some tests using Quickcheck or HUnit,
 * Refactor to use applicative and monadic styles where it makes the code easier to read,
+* Refactor the `Classify` module to use a statistics library,
 * Make it more robust by adding error checking around the CLI, reading files etc.,
 * Write the score assigned to each email into the `X-Spam-Status` header of the file and save the modified file,
 * Make the program capable of working as a real filter, by enabling it to read the contents of messages from `stdin`,
