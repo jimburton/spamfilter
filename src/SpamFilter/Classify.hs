@@ -12,11 +12,13 @@ Module which provides functions to classify an individual message as
 Ham|Spam|Unclear. (All of the functions in this module are pure and may be 
 a good target for parallelisation...) 
 -}
-module Classify (classify, getWordFeature, getWordFeat) where
+module SpamFilter.Classify 
+    (classify, getWordFeature, getWordFeat) 
+    where
 
 import qualified Data.Map as M
 
-import Types
+import SpamFilter.Types
 
 {-| A message with a higher rating than maxHamScore is not ham. -}
 maxHamScore :: Float
@@ -61,7 +63,7 @@ getWordFeat w ham spam thePK = WordFeature {word = w,
 
 {-| The basic probability that a WordFeature contains a spam word. -}
 spamProb :: WMap -> WordFeature -> Float
-spamProb (sc, hc, m) feat = 
+spamProb (sc, hc, _) feat = 
     let spamFreq = fromIntegral (spamCount feat) / fromIntegral (max 1 sc)
         hamFreq = fromIntegral (hamCount feat) / fromIntegral (max 1 hc)
     in
@@ -70,6 +72,8 @@ spamProb (sc, hc, m) feat =
 {-| The Bayesean probability that a WordFeature contains a spam word --
 i.e., the probability based on the probilities of the other words in the message
 being spam. -}
+bayesSpamProb :: (Int, Int, M.Map String WordFeature)
+                       -> WordFeature -> Float
 bayesSpamProb (sc, hc, m) feat = 
     let assumedProb =  0.5
         weight = 1
@@ -99,9 +103,9 @@ inverseChiSquare value df =
     if odd df then error "Degree must be even"
     else let m = value / 2.0
              e = exp 1
-             sum = e ** negate m
-             term = sum
+             theSum = e ** negate m
+             term = theSum
              dfRange = take (df `div` 2) $ iterate (+1) 1
-             (sum', term') = foldl (\(s,t) i -> let t' = t * (m/i) in
-                                                (s+t', t')) (sum, term) dfRange
+             (sum', _) = foldl (\(s,t) i -> let t' = t * (m/i) in
+                                            (s+t', t')) (theSum, term) dfRange
          in min sum' 1.0

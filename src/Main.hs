@@ -15,14 +15,15 @@ modules.
 module Main where
 
 import System.Environment (getArgs)
+import System.FilePath    ((</>))
 import System.Exit (exitWith, ExitCode (ExitFailure))
 import Data.Maybe (fromJust)
-import Control.Monad (foldM, mapM_)
+import Control.Applicative ((<$>))
 
-import DBHelper (getWMap, putWMap)
-import Classify (classify)
-import Types (WMap, MsgType(..))
-import Train (train, trainWMap, getWords)
+import SpamFilter.DBHelper (getWMap, putWMap)
+import SpamFilter.Classify (classify)
+import SpamFilter.Types (WMap, MsgType(..))
+import SpamFilter.Train (train, getWords)
 
 {-| Lookup table mapping command-line options to functions. -}
 dispatch :: [(String, [String] -> IO ())]  
@@ -39,15 +40,19 @@ trainAct args = do
   
 {-| Start classifying. -}
 classifyAct :: [String] -> IO ()
-classifyAct (msgPath:args) = do
-  let msg = head args
+classifyAct (msgPath:_) = do
   wm <- getWMap
   ws <- getWords msgPath
   let (typ, score) = classify wm ws
   putStrLn $ show typ ++ ": " ++ show score
+classifyAct _ = usageAndExit
+
+usageAndExit :: IO ()
+usageAndExit = putStrLn "TODO"
 
 {-| The entry point for the program. -}
-main = do  
+main :: IO ()
+main = do
   args <- getArgs
   if null args 
   then exitWith (ExitFailure 1)
@@ -58,19 +63,27 @@ main = do
             Nothing -> putStrLn "Unknown argument"
 
 {-| This should be in a test module-}
-trainAndTest = do 
+trainOnCorpus :: IO WMap
+trainOnCorpus = do 
   wm <- getWMap
-  let hams = ["/home/jb259/sa-corpus/easy_ham"
-             , "/home/jb259/sa-corpus/easy_ham"
-             , "/home/jb259/sa-corpus/hard_ham"]
-      spams = ["/home/jb259/sa-corpus/spam"
-              , "/home/jb259/sa-corpus/spam_2"]
-      pathToMail = "/home/jb259/haskell/src/spamfilter/etc/mail/"
+  let hamPath = "/home/jb259/mail-corpora/ham"
+      spamPath = "/home/jb259/mail-corpora/spam"
+  Just wm' <- train wm hamPath Ham
+  fromJust <$> train wm' spamPath Spam
+
+testOnSamples :: WMap -> IO ()
+testOnSamples wm = do
+  let pathToMail = "/home/jb259/haskell/src/spamfilter/etc/mail/"
       testMsgs = ["ham1.email", "ham2.email", "ham3.email", "ham4.email"
                  , "ham5.email", "spam1.email", "spam2.email", "spam3.email"
                  , "spam4.email", "spam5.email"]
-  Just wm' <- foldM (\wm path -> train (fromJust wm) path Ham) (Just wm) hams
-  Just wm'' <- foldM (\wm path -> train (fromJust wm) path Spam) (Just wm') spams
-  mapM_ (\msg -> do ws <- getWords (pathToMail ++ msg)
-                    let (typ, score) = classify wm'' ws
+  mapM_ (\msg -> do ws <- getWords (pathToMail </> msg)
+                    let (typ, score) = classify wm ws
                     putStrLn $ msg ++ ": " ++ show typ ++ ": " ++ show score) testMsgs
+
+  
+trainAndTest :: IO ()
+trainAndTest = trainOnCorpus >>= testOnSamples
+
+trainAndStore :: IO ()
+trainAndStore = trainOnCorpus >>= putWMap

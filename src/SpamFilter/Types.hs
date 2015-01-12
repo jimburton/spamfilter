@@ -10,7 +10,7 @@ Portability :  portable
 
 Definitions of the types used in the program. 
 -}
-module Types where
+module SpamFilter.Types where
 
 import Control.Applicative
 import qualified Data.Map as M

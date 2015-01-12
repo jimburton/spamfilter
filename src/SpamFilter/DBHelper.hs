@@ -13,50 +13,50 @@ Module which supports interaction with the sqlite database which stores the
 results of training the filter. Uses the library sqlite-simple to access an
 SQLite database.
 -}
-module DBHelper (putWMap, getWMap) where
+module SpamFilter.DBHelper 
+    (putWMap, getWMap) 
+    where
 
-import Control.Applicative
 import Database.SQLite.Simple
-import Database.SQLite.Simple.FromRow
 import qualified Data.Map as M
 
 import System.Environment.XDG.BaseDir (getUserDataDir)
 import System.FilePath    ((</>))
 
-import Types (WordFeature(..), WordRow(..), WMap(..), MsgType(..))
+import SpamFilter.Types 
+    (WordFeature(..), WordRow(..), WMap)
 
-dbDir :: IO String
-dbDir = getUserDataDir ("spamfilter" </> "spam.db")
+dbPath :: IO String
+dbPath = getUserDataDir ("spamfilter" </> "spam.db")
 
 {-| Store the contents of a WMap in the database. -}
 putWMap :: WMap -> IO ()
 putWMap (hc, sc, m) = do
-  userdir <- dbDir
-  conn <- open userdir
+  userdb <- dbPath
+  conn <- open userdb
   withTransaction conn $ do
-    let (is, us) = foldl (\(is,us) (_, feat@WordFeature{pk=mi})
-                          -> maybe (feat:is,us) (const (is,feat:us)) mi) 
+    let (is, us) = foldl (\(is',us') (_, feat@WordFeature{pk=mi})
+                          -> maybe (feat:is',us') (const (is',feat:us')) mi) 
                    ([], []) $ M.toList m
     mapM_ (updateWord conn) us
     mapM_ (insertWord conn) is
-    updateCount conn hc Ham
-    updateCount conn sc Spam
+    updateCount conn hc "H"
+    updateCount conn sc "S"
 
 {-| Update a row in the counts table. -}
-updateCount :: Connection -> Int -> MsgType -> IO ()
-updateCount conn count t = do
-  let c = case t of 
-            Ham -> "H"
-            Spam -> "S"
-  execute conn "UPDATE counts SET count=? WHERE type = ?" 
-              (count :: Int, c :: String)
+updateCount :: Connection -> Int -> String -> IO ()
+updateCount conn count t = execute conn "UPDATE counts SET count=? WHERE type = ?" 
+              (count :: Int, t :: String)
 
 {-| Update a row in the words table. -}
+updateWord :: Connection -> WordFeature -> IO ()
 updateWord conn WordFeature {hamCount = hs, spamCount = ss, pk = Just i} = 
     execute conn "UPDATE words SET hamcount=?, spamcount=? WHERE id = ?" 
                 (hs :: Int, ss :: Int, i :: Int) 
+updateWord _ (WordFeature _ _ _ Nothing) = undefined
 
 {-| Insert a word that we haven't seen before -}
+insertWord :: Connection -> WordFeature -> IO ()
 insertWord conn WordFeature {word = w, hamCount = hs, spamCount = ss} = 
     execute conn "INSERT INTO words (word, hamcount, spamcount) VALUES (?,?,?)" 
                 (w :: String, hs :: Int, ss :: Int) 
@@ -64,8 +64,8 @@ insertWord conn WordFeature {word = w, hamCount = hs, spamCount = ss} =
 {-| Pull the contents of the database into a WMap. -}
 getWMap :: IO WMap
 getWMap = do
-  userdir <- dbDir
-  conn <- open userdir
+  userdb <- dbPath
+  conn <- open userdb
   r <- query_ conn "SELECT * from words" :: IO [WordRow]
   let wMap = foldl (\ht (WordRow i w hs ss) -> M.insert w 
                     WordFeature {word = w,

@@ -11,24 +11,24 @@ Portability :  portable
 Contains functions devoted to reading in mail messages and passing their contents 
 to functions in the classify module. 
 -}
-module Train (train, trainWMap, getWords) where
+module SpamFilter.Train 
+    (train, trainWMap, getWords) 
+    where
 
 import Prelude hiding (readFile)
 import System.IO (hPutStr, stderr) 
-import System.IO.Error (ioeGetErrorString, ioeGetLocation)
 import Control.Exception (IOException, catch)
 import Control.Monad (forM, foldM)
 import System.Directory (doesDirectoryExist, getDirectoryContents)
 import System.FilePath ((</>))
 import qualified Data.Map as M
-import Data.List.Split (splitOn)
 import Data.Maybe (fromJust)
 import Data.ByteString.Char8 (readFile, unpack)
 import Text.Regex.Posix ((=~))
 import Data.List (nub)
 
-import Types
-import Classify
+import SpamFilter.Types
+import SpamFilter.Classify
 
 {-| Takes a WMap reflecting the current state of the filter (i.e. what is currently
 known about spam and ham), the path to some spam or ham message(s) and a MsgType to
@@ -70,7 +70,7 @@ incrementCount Spam (hc, sc, m) s =
                        (spamCount wf + 1) (pk wf)) mfeat 
     in 
       (hc, sc+1, M.insert s feat m)
-
+incrementCount Unclear _ _ = error "We don't count unclears"
 
 {-| Takes the path to an email and returns just the words in the body of the email.
 -}
