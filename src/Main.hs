@@ -14,11 +14,12 @@ modules.
 -}
 module Main where
 
-import System.Environment (getArgs)
-import System.FilePath    ((</>))
-import System.Exit (exitWith, ExitCode (ExitFailure))
-import Data.Maybe (fromJust)
 import Control.Applicative ((<$>))
+import Data.Char (toLower, toUpper)
+import Data.Maybe (fromJust)
+import System.Environment (getArgs)
+import System.Exit (exitWith, ExitCode (ExitFailure))
+import System.FilePath    ((</>))
 
 import SpamFilter.DBHelper (getWMap, putWMap)
 import SpamFilter.Classify (classify)
@@ -34,7 +35,7 @@ dispatch =  [ ("train", trainAct)
 {-| Start training. -}
 trainAct :: [String] -> IO ()
 trainAct args = do
-  let t = (read $ head args) :: MsgType 
+  let t = (read $ toCamelCase $ head args) :: MsgType 
       path = head (tail args) 
   getWMap >>= \wm -> train wm path t >>= putWMap . fromJust
   
@@ -61,6 +62,10 @@ main = do
           case mAct of
             (Just action) -> action (tail args)
             Nothing -> putStrLn "Unknown argument"
+
+toCamelCase :: String -> String
+toCamelCase "" = ""
+toCamelCase (x:xs) = toUpper x : (map toLower xs)
 
 {-| This should be in a test module-}
 trainOnCorpus :: IO WMap

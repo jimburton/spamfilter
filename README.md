@@ -17,6 +17,7 @@ Setting up the project
 * Build the program:
 ```bash
     $ cd spamfilter
+    $ cabal sandbox init
     $ cabal install
 ```
 * Run the script `setupdb.sh`
