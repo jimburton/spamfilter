@@ -18,7 +18,6 @@ import Control.Applicative ((<$>))
 import Data.Char (toLower, toUpper)
 import Data.Maybe (fromJust)
 import System.Environment (getArgs)
-import System.Exit (exitWith, ExitCode (ExitFailure))
 import System.FilePath    ((</>))
 
 import SpamFilter.DBHelper (getWMap, putWMap)
@@ -49,19 +48,21 @@ classifyAct (msgPath:_) = do
 classifyAct _ = usageAndExit
 
 usageAndExit :: IO ()
-usageAndExit = putStrLn "TODO"
+usageAndExit = putStrLn "spamfilter train path/to/email [Ham|Spam] \
+\ \nor \nspamfilter classify path/to/email"
 
 {-| The entry point for the program. -}
 main :: IO ()
 main = do
   args <- getArgs
   if null args 
-  then exitWith (ExitFailure 1)
+  then usageAndExit
   else do let cmd = head args
               mAct = lookup cmd dispatch  
           case mAct of
             (Just action) -> action (tail args)
-            Nothing -> putStrLn "Unknown argument"
+            Nothing -> do putStrLn "Unknown argument"
+                          usageAndExit
 
 toCamelCase :: String -> String
 toCamelCase "" = ""
@@ -78,7 +79,7 @@ trainOnCorpus = do
 
 testOnSamples :: WMap -> IO ()
 testOnSamples wm = do
-  let pathToMail = "/home/jb259/haskell/src/spamfilter/etc/mail/"
+  let pathToMail = "/home/jb259/spamfilter/etc/mail/"
       testMsgs = ["ham1.email", "ham2.email", "ham3.email", "ham4.email"
                  , "ham5.email", "spam1.email", "spam2.email", "spam3.email"
                  , "spam4.email", "spam5.email"]
