@@ -18,7 +18,6 @@ import           Control.Applicative ((<$>))
 import           Data.Char           (toLower, toUpper)
 import           Data.Maybe          (fromJust)
 import           System.Environment  (getArgs)
-import           System.Exit         (ExitCode (ExitFailure), exitWith)
 import           System.FilePath     ((</>))
 import           SpamFilter.Classify (classify)
 import           SpamFilter.DBHelper (getWMap, putWMap)
@@ -46,23 +45,6 @@ classifyAct (msgPath:_) = do
   let (typ, score) = classify wm ws
   putStrLn $ show typ ++ ": " ++ show score
 classifyAct _ = usageAndExit
-
-usageAndExit :: IO ()
-usageAndExit = putStrLn "spamfilter train path/to/email [Ham|Spam] \
-\ \nor \nspamfilter classify path/to/email"
-
-{-| The entry point for the program. -}
-main :: IO ()
-main = do
-  args <- getArgs
-  if null args
-  then exitWith (ExitFailure 1)
-  else do let cmd = head args
-              mAct = lookup cmd dispatch
-          case mAct of
-            (Just action) -> action (tail args)
-            Nothing -> do putStrLn "Unknown argument"
-                          usageAndExit
 
 toCamelCase :: String -> String
 toCamelCase ""     = ""
@@ -93,3 +75,20 @@ trainAndTest = trainOnCorpus >>= testOnSamples
 
 trainAndStore :: IO ()
 trainAndStore = trainOnCorpus >>= putWMap
+
+usageAndExit :: IO ()
+usageAndExit = putStrLn "spamfilter train path/to/email [Ham|Spam] \
+\ \nor \nspamfilter classify path/to/email"
+
+{-| The entry point for the program. -}
+main :: IO ()
+main = do
+  args <- getArgs
+  if null args
+  then usageAndExit
+  else do let cmd = head args
+              mAct = lookup cmd dispatch
+          case mAct of
+            (Just action) -> action (tail args)
+            Nothing       -> do putStrLn "Unknown argument"
+                                usageAndExit

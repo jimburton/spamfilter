@@ -12,7 +12,6 @@ Definitions of the types used in the program.
 -}
 module SpamFilter.Types where
 
-import           Control.Applicative
 import qualified Data.Map                       as M
 import           Database.SQLite.Simple.FromRow
 
