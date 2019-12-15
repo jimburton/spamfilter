@@ -17,10 +17,10 @@ cabal-version:       >=1.10
 
 executable spamfilter
   main-is:             Main.hs
-  other-modules:       SpamFilter.DBHelper
+  other-modules:       SpamFilter.Classify
+                     , SpamFilter.DBHelper
                      , SpamFilter.Train
                      , SpamFilter.Types
-                     , SpamFilter.Classify
   Ghc-Options:         -Wall       
   other-extensions:    OverloadedStrings
   build-depends:       base
