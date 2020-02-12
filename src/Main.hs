@@ -14,15 +14,13 @@ modules.
 -}
 module Main where
 
-import           Control.Applicative ((<$>))
 import           Data.Char           (toLower, toUpper)
 import           Data.Maybe          (fromJust)
 import           System.Environment  (getArgs)
-import           System.FilePath     ((</>))
 import           SpamFilter.Classify (classify)
 import           SpamFilter.DBHelper (getWMap, putWMap)
 import           SpamFilter.Train    (getWords, train)
-import           SpamFilter.Types    (MsgType (..), WMap)
+import           SpamFilter.Types    (MsgType (..))
 
 {-| Lookup table mapping command-line options to functions. -}
 dispatch :: [(String, [String] -> IO ())]
@@ -50,34 +48,8 @@ toCamelCase :: String -> String
 toCamelCase ""     = ""
 toCamelCase (x:xs) = toUpper x : (map toLower xs)
 
-{-| This should be in a test module-}
-trainOnCorpus :: IO WMap
-trainOnCorpus = do
-  wm <- getWMap
-  let hamPath = "/home/jb259/mail-corpora/ham"
-      spamPath = "/home/jb259/mail-corpora/spam"
-  Just wm' <- train wm hamPath Ham
-  fromJust <$> train wm' spamPath Spam
-
-testOnSamples :: WMap -> IO ()
-testOnSamples wm = do
-  let pathToMail = "/home/jb259/spamfilter/etc/mail/"
-      testMsgs = ["ham1.email", "ham2.email", "ham3.email", "ham4.email"
-                 , "ham5.email", "spam1.email", "spam2.email", "spam3.email"
-                 , "spam4.email", "spam5.email"]
-  mapM_ (\msg -> do ws <- getWords (pathToMail </> msg)
-                    let (typ, score) = classify wm ws
-                    putStrLn $ msg ++ ": " ++ show typ ++ ": " ++ show score) testMsgs
-
-
-trainAndTest :: IO ()
-trainAndTest = trainOnCorpus >>= testOnSamples
-
-trainAndStore :: IO ()
-trainAndStore = trainOnCorpus >>= putWMap
-
 usageAndExit :: IO ()
-usageAndExit = putStrLn "spamfilter train path/to/email [Ham|Spam] \
+usageAndExit = putStrLn "spamfilter train [Ham|Spam] path/to/email \
 \ \nor \nspamfilter classify path/to/email"
 
 {-| The entry point for the program. -}
