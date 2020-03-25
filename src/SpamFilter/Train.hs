@@ -1,3 +1,4 @@
+
 {- |
 Module      :  Train.hs
 Description :  Functions for training the spam program
@@ -82,9 +83,11 @@ getWords p = do
       (before, _, after) = unpack str =~ lineBreakPat :: (String,String,String)
       str' = if null after then before else after
       --just the actual words
-      --wordPat = "([a-zA-Z]\\w*)"
-      --(_, _, _, ws) = str' =~ wordPat :: (String, String, String, [String])
-  return $ nub (words str')
+      wordPat       = "([a-zA-Z]+)"
+      (_, _, _, ws) = str' =~ wordPat :: (String, String, String, [String])
+  -- return $ nub (words str')
+  -- return $ nub ws
+  return ws
 
 {-| Collect all filepaths within a given directory, recursively drilling down as
 necessary.

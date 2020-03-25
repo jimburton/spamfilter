@@ -21,11 +21,11 @@ import           SpamFilter.Types
 
 {-| A message with a higher rating than maxHamScore is not ham. -}
 maxHamScore :: Float
-maxHamScore = 0.4
+maxHamScore = 0.46
 
 {-| A message with a lower rating than minSpamScore is not spam. -}
 minSpamScore :: Float
-minSpamScore = 0.6
+minSpamScore = 0.56
 
 {-| Classify the contents of a message as Ham|Spam|Unclear, based on
 the contents of the WMap. -}
