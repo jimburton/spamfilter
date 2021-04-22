@@ -1,4 +1,3 @@
-
 {- |
 Module      :  Train.hs
 Description :  Functions for training the spam program
@@ -19,7 +18,6 @@ module SpamFilter.Train
 import           Control.Exception     (IOException, catch)
 import           Control.Monad         (foldM, forM)
 import           Data.ByteString.Char8 (readFile, unpack)
-import           Data.List             (nub)
 import qualified Data.Map              as M
 import           Data.Maybe            (fromJust)
 import           Prelude               hiding (readFile)
