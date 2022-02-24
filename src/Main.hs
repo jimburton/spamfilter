@@ -46,7 +46,7 @@ classifyAct _ = usageAndExit
 
 toCamelCase :: String -> String
 toCamelCase ""     = ""
-toCamelCase (x:xs) = toUpper x : (map toLower xs)
+toCamelCase (x:xs) = toUpper x : map toLower xs
 
 usageAndExit :: IO ()
 usageAndExit = putStrLn "spamfilter train [Ham|Spam] path/to/email \
