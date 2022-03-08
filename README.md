@@ -42,9 +42,9 @@ like [CygWin](https://www.cygwin.com/) or
   number of ham and spam examples provided with this repository:
   
   ```
-  $ cabal run spamfilter -- train Ham etc/mail/ham
-  $ cabal run spamfilter -- train Spam etc/mail/spam
-  $ cabal run spamfilter -- classify etc/mail/ham/ham1.email 
+  $ cabal run spamfilter train Ham etc/mail/ham
+  $ cabal run spamfilter train Spam etc/mail/spam
+  $ cabal run spamfilter classify etc/mail/ham/ham1.email 
   Up to date
   Ham: 0.32777208
   $ cabal run spamfilter -- classify etc/mail/spam/spam1.email 
@@ -90,5 +90,3 @@ Ways to improve the program
   email, update the word counts in the database accordingly...
   
 * Add some documentation and improve on the Cabal metadata.
-
-

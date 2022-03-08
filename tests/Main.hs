@@ -1,7 +1,4 @@
 module Main where
-{-
-TODO -- write some tests!
--}
 
 import Control.Applicative ((<$>))
 import System.FilePath     ((</>))

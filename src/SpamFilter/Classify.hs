@@ -17,7 +17,8 @@ module SpamFilter.Classify
     where
 
 import qualified Data.Map         as M
-import           SpamFilter.Types
+import SpamFilter.Types ( WordFeature(..), MsgType(..), WMap )
+import Data.Maybe (fromMaybe)
 
 {-| A message with a higher rating than maxHamScore is not ham. -}
 maxHamScore :: Float
@@ -47,11 +48,11 @@ extractFeatures m = map (getWordFeature m)
 {-| Look up a word in the WMap, retrieving the WordFeature associated
 with this word. If it isn't in the WMap yet, create a new WordFeature. -}
 getWordFeature :: WMap -> String -> WordFeature
-getWordFeature (_, _, m) str = maybe WordFeature
+getWordFeature (_, _, m) str = fromMaybe WordFeature
                                       {word = str,
                                        hamCount = 0,
                                        spamCount = 0,
-                                       pk = Nothing} id (M.lookup str m)
+                                       pk = Nothing} (M.lookup str m)
 
 {-| Wrapper for the WordFeature type constructor. -}
 getWordFeat :: String -> Int -> Int -> Maybe Int -> WordFeature
