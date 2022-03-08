@@ -13,19 +13,25 @@ Module which supports interaction with the sqlite database which stores the
 results of training the filter. Uses the library sqlite-simple to access an
 SQLite database.
 -}
-module SpamFilter.DBHelper
-    (putWMap, getWMap)
+module SpamFilter.DBHelper (putWMap, getWMap)
     where
 
 import qualified Data.Map                       as M
 import           Database.SQLite.Simple
-
+  ( Only(fromOnly)
+  , Connection
+  , close
+  , execute
+  , open
+  , query_
+  , withTransaction )
 import           System.Environment.XDG.BaseDir (getUserDataDir)
 import           System.FilePath                ((</>))
 
 import           SpamFilter.Types               (WMap, WordFeature (..),
                                                  WordRow (..))
 
+-- | Path to the database.
 dbPath :: IO String
 dbPath = getUserDataDir ("spamfilter" </> "spam.db")
 

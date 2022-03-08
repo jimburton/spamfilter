@@ -26,9 +26,11 @@ import           System.Directory      (doesDirectoryExist,
 import           System.FilePath       ((</>))
 import           System.IO             (hPutStr, stderr)
 import           Text.Regex.Posix      ((=~))
-
-import           SpamFilter.Classify
+import           SpamFilter.Classify ( getWordFeat )
 import           SpamFilter.Types
+    ( WMap
+    , WordFeature(hamCount, spamCount, pk)
+    , MsgType(..) )
 
 {-| Takes a WMap reflecting the current state of the filter (i.e. what is currently
 known about spam and ham), the path to some spam or ham message(s) and a MsgType to
@@ -109,6 +111,3 @@ handler e = do
   let err = show (e :: IOException)
   hPutStr stderr ("Warning: Couldn't open file: " ++ err)
   return Nothing
-
-
-

@@ -56,10 +56,10 @@ getWordFeature (_, _, m) str = fromMaybe WordFeature
 
 {-| Wrapper for the WordFeature type constructor. -}
 getWordFeat :: String -> Int -> Int -> Maybe Int -> WordFeature
-getWordFeat w ham spam thePK = WordFeature {word = w,
-                                            hamCount = ham,
-                                            spamCount = spam,
-                                            pk = thePK}
+getWordFeat w ham spam thePK = WordFeature { word = w
+                                           , hamCount = ham
+                                           , spamCount = spam
+                                           , pk = thePK }
 
 {-| The basic probability that a WordFeature contains a spam word. -}
 spamProb :: WMap -> WordFeature -> Float
