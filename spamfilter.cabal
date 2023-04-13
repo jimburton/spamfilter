@@ -8,7 +8,7 @@ synopsis:            A Haskell port of Peter Seibel's Common Lisp spam filter
 license:             MIT
 license-file:        LICENSE
 author:              Jim Burton
-maintainer:          j.burton@brighton.ac.uk
+maintainer:          jimburton1@gmail.com
 -- copyright:           
 category:            Email     
 build-type:          Simple

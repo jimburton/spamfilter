@@ -5,7 +5,7 @@ Description :  Database helper for the spamfilter program
 Copyright   :  (c) Jim Burton
 License     :  MIT
 
-Maintainer  :  j.burton@brighton.ac.uk
+Maintainer  :  jimburton1@gmail.com
 Stability   :  provisional
 Portability :  portable
 
@@ -16,8 +16,8 @@ SQLite database.
 module SpamFilter.DBHelper (putWMap, getWMap)
     where
 
-import qualified Data.Map                       as M
-import           Database.SQLite.Simple
+import qualified Data.Map as M
+import Database.SQLite.Simple
   ( Only(fromOnly)
   , Connection
   , close
@@ -25,17 +25,15 @@ import           Database.SQLite.Simple
   , open
   , query_
   , withTransaction )
-import           System.Environment.XDG.BaseDir (getUserDataDir)
-import           System.FilePath                ((</>))
-
-import           SpamFilter.Types               (WMap, WordFeature (..),
-                                                 WordRow (..))
+import System.Environment.XDG.BaseDir (getUserDataDir)
+import System.FilePath ((</>))
+import SpamFilter.Types (WMap, WordFeature (..), WordRow (..))
 
 -- | Path to the database.
 dbPath :: IO String
 dbPath = getUserDataDir ("spamfilter" </> "spam.db")
 
-{-| Store the contents of a WMap in the database. -}
+-- | Store the contents of a WMap in the database.
 putWMap :: WMap -> IO ()
 putWMap (hc, sc, m) = do
   userdb <- dbPath
@@ -49,25 +47,25 @@ putWMap (hc, sc, m) = do
     updateCount conn hc "H"
     updateCount conn sc "S"
 
-{-| Update a row in the counts table. -}
+-- | Update a row in the counts table.
 updateCount :: Connection -> Int -> String -> IO ()
 updateCount conn count t = execute conn "UPDATE counts SET count=? WHERE type = ?"
               (count :: Int, t :: String)
 
-{-| Update a row in the words table. -}
+-- | Update a row in the words table.
 updateWord :: Connection -> WordFeature -> IO ()
 updateWord conn WordFeature {hamCount = hs, spamCount = ss, pk = Just i} =
     execute conn "UPDATE words SET hamcount=?, spamcount=? WHERE id = ?"
                 (hs :: Int, ss :: Int, i :: Int)
 updateWord _ (WordFeature _ _ _ Nothing) = undefined
 
-{-| Insert a word that we haven't seen before -}
+-- | Insert a word that we haven't seen before.
 insertWord :: Connection -> WordFeature -> IO ()
 insertWord conn WordFeature {word = w, hamCount = hs, spamCount = ss} =
     execute conn "INSERT INTO words (word, hamcount, spamcount) VALUES (?,?,?)"
                 (w :: String, hs :: Int, ss :: Int)
 
-{-| Pull the contents of the database into a WMap. -}
+-- | Pull the contents of the database into a WMap.
 getWMap :: IO WMap
 getWMap = do
   userdb <- dbPath

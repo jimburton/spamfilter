@@ -4,7 +4,7 @@ Description :  Functions for training the spam program
 Copyright   :  (c) Jim Burton
 License     :  MIT
 
-Maintainer  :  j.burton@brighton.ac.uk
+Maintainer  :  jimburton1@gmail.com
 Stability   :  provisional
 Portability :  portable
 
@@ -32,31 +32,29 @@ import           SpamFilter.Types
     , WordFeature(hamCount, spamCount, pk)
     , MsgType(..) )
 
-{-| Takes a WMap reflecting the current state of the filter (i.e. what is currently
-known about spam and ham), the path to some spam or ham message(s) and a MsgType to
-say whether the message(s) should be added as spam or ham. Returns an updated WMap
-reflecting the new state of the filter.
--}
-train :: WMap -> FilePath -> MsgType -> IO (Maybe WMap)
-train wm path t = do
+-- | Takes a WMap reflecting the current state of the filter (i.e. what is currently
+-- | known about spam and ham), the path to some spam or ham message(s) and a MsgType to
+-- | say whether the message(s) should be added as spam or ham. Returns an updated WMap
+-- | reflecting the new state of the filter.
+train :: FilePath -> MsgType -> WMap -> IO (Maybe WMap)
+train path t wm = do
   isDirectory <- doesDirectoryExist path
   if isDirectory then do fs <- getRecursiveContents path
-                         foldM (\acc f -> trainFile (fromJust acc) f t
+                         foldM (\acc f -> trainFile f t (fromJust acc)
                                           `catch` handler) (Just wm) fs
-  else trainFile wm path t `catch` handler
+  else trainFile path t wm `catch` handler
 
-{-| Train the filter on an individual file containing an email.
--}
-trainFile :: WMap -> FilePath -> MsgType -> IO (Maybe WMap)
-trainFile wm path t = do
+-- | Train the filter on an individual file containing an email.
+trainFile :: FilePath -> MsgType -> WMap -> IO (Maybe WMap)
+trainFile path t wm = do
   ws <- getWords path
-  return $ Just (trainWMap wm ws t)
+  return $ Just (trainWMap ws t wm)
 
-{-| Update the ham or spam counts in the WMap for this list of words. -}
-trainWMap :: WMap -> [String] -> MsgType -> WMap
-trainWMap m s t = foldl (incrementCount t) m s
+-- | Update the ham or spam counts in the WMap for this list of words.
+trainWMap :: [String] -> MsgType -> WMap -> WMap
+trainWMap s t wm = foldl (incrementCount t) wm s
 
-{-| Update the ham or spam counts in the WMap for this particular word. -}
+-- | Update the ham or spam counts in the WMap for this particular word.
 incrementCount :: MsgType -> WMap -> String -> WMap
 incrementCount Ham (hc, sc, m) s =
     let mfeat = M.lookup s m
@@ -74,8 +72,7 @@ incrementCount Spam (hc, sc, m) s =
       (hc, sc+1, M.insert s feat m)
 incrementCount Unclear _ _ = error "We don't count unclears"
 
-{-| Takes the path to an email and returns just the words in the body of the email.
--}
+-- | Takes the path to an email and returns just the words in the body of the email.
 getWords :: FilePath -> IO [String]
 getWords p = do
   str <- readFile p
@@ -87,11 +84,10 @@ getWords p = do
       (_, _, _, ws) = str' =~ wordPat :: (String, String, String, [String])
   -- return $ nub (words str')
   -- return $ nub ws
-  return ws
+  pure ws
 
-{-| Collect all filepaths within a given directory, recursively drilling down as
-necessary.
--}
+-- | Collect all filepaths within a given directory, recursively drilling down as
+-- | necessary.
 getRecursiveContents :: FilePath -> IO [FilePath]
 getRecursiveContents topdir = do
   names <- getDirectoryContents topdir
@@ -102,12 +98,9 @@ getRecursiveContents topdir = do
     if isDirectory
       then getRecursiveContents path
       else return [path]
-  return (concat paths)
+  pure (concat paths)
 
-{-| Handles exceptions.
--}
+-- | Handles exceptions.
 handler :: IOException -> IO (Maybe a)
-handler e = do
-  let err = show (e :: IOException)
-  hPutStr stderr ("Warning: Couldn't open file: " ++ err)
-  return Nothing
+handler e = let err = show (e :: IOException) in
+  hPutStr stderr ("Warning: Couldn't open file: " ++ err) >> pure Nothing
